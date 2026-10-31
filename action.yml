@@ -1,0 +1,51 @@
+name: AppForShare upload
+description: Upload an iOS or Android build to AppForShare and get an install link for your testers.
+author: AppForShare
+branding:
+  icon: upload-cloud
+  color: blue
+inputs:
+  file:
+    description: Path to the .ipa or .apk
+    required: true
+  token:
+    description: AppForShare API token (store it as a secret)
+    required: true
+  release-notes:
+    description: Release notes shown to testers
+    required: false
+    default: ''
+  fail-on:
+    description: 'Fail the step when the store readiness check is "blocked", or "review" (also fails on blocked). The build is still uploaded.'
+    required: false
+    default: ''
+  api-url:
+    description: API origin
+    required: false
+    default: https://appforshare.io
+outputs:
+  url:
+    description: Install link
+    value: ${{ steps.upload.outputs.url }}
+  slug:
+    description: Share code of the build
+    value: ${{ steps.upload.outputs.slug }}
+  readiness:
+    description: Store readiness status (ready, review, blocked or unknown)
+    value: ${{ steps.upload.outputs.readiness }}
+runs:
+  using: composite
+  steps:
+    - id: upload
+      shell: bash
+      env:
+        APPFORSHARE_TOKEN: ${{ inputs.token }}
+        APPFORSHARE_API: ${{ inputs.api-url }}
+        AFS_FILE: ${{ inputs.file }}
+        AFS_NOTES: ${{ inputs.release-notes }}
+        AFS_FAIL_ON: ${{ inputs.fail-on }}
+      run: |
+        args=(upload "$AFS_FILE")
+        if [ -n "$AFS_NOTES" ]; then args+=(--notes "$AFS_NOTES"); fi
+        if [ -n "$AFS_FAIL_ON" ]; then args+=(--fail-on "$AFS_FAIL_ON"); fi
+        npx --yes appforshare@1 "${args[@]}"
