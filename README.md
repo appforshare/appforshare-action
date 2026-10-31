@@ -22,6 +22,7 @@ as a repository secret. The runner needs Node 18 or newer (GitHub hosted runners
 | `file` | yes | Path to the .ipa or .apk |
 | `token` | yes | AppForShare API token |
 | `release-notes` | no | Shown to testers on the install page |
+| `channel` | no | Put the build into a channel (`beta`, `live`), created on first use. Its link always opens the newest build in it. |
 | `fail-on` | no | `blocked`, or `review` (also fails on blocked): fail the step on the store readiness check. The build stays uploaded and its link works. |
 | `api-url` | no | API origin, default `https://appforshare.io` |
 
@@ -30,6 +31,7 @@ as a repository secret. The runner needs Node 18 or newer (GitHub hosted runners
 | `url` | Install link |
 | `slug` | Share code of the build |
 | `readiness` | Store readiness status: `ready`, `review`, `blocked` or `unknown` |
+| `channel-url` | Stable link of the channel, when `channel` is set |
 
 The store readiness check is guidance about current App Store and Google Play rules, not a promise of approval.
 More examples: https://appforshare.io/docs/ci
