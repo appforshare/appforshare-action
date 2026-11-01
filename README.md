@@ -1,6 +1,6 @@
 # AppForShare upload action
 
-Upload an iOS (.ipa) or Android (.apk) build to [AppForShare](https://appforshare.io) and get an install link and
+Upload an iOS (.ipa) or Android (.apk or .aab) build to [AppForShare](https://appforshare.io) and get an install link and
 QR code page for your testers.
 
 ```yaml
@@ -17,9 +17,12 @@ QR code page for your testers.
 Needs a Pro or Team plan. Create the token in your AppForShare dashboard under Settings, API tokens, and store it
 as a repository secret. The runner needs Node 18 or newer (GitHub hosted runners have it).
 
+An .aab is turned into one universal APK that testers can install, signed with your workspace test key or with
+your own keystore if you added one under Settings, Android .aab uploads.
+
 | Input | Required | |
 |---|---|---|
-| `file` | yes | Path to the .ipa or .apk |
+| `file` | yes | Path to the .ipa, .apk or .aab |
 | `token` | yes | AppForShare API token |
 | `release-notes` | no | Shown to testers on the install page |
 | `channel` | no | Put the build into a channel (`beta`, `live`), created on first use. Its link always opens the newest build in it. |

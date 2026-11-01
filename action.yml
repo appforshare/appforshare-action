@@ -6,7 +6,7 @@ branding:
   color: blue
 inputs:
   file:
-    description: Path to the .ipa or .apk
+    description: Path to the .ipa, .apk or .aab
     required: true
   token:
     description: AppForShare API token (store it as a secret)
