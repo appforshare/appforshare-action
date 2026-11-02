@@ -19,6 +19,14 @@ inputs:
     description: 'Put the build into this channel (beta, live), created on first use. Its link always opens the newest build in it (Pro and Team).'
     required: false
     default: ''
+  groups:
+    description: 'Share the build with these tester groups when ready, comma separated (Team).'
+    required: false
+    default: ''
+  testers:
+    description: 'Share the build with these tester emails when ready, comma separated (Team).'
+    required: false
+    default: ''
   fail-on:
     description: 'Fail the step when the store readiness check is "blocked", or "review" (also fails on blocked). The build is still uploaded.'
     required: false
@@ -52,9 +60,13 @@ runs:
         AFS_NOTES: ${{ inputs.release-notes }}
         AFS_FAIL_ON: ${{ inputs.fail-on }}
         AFS_CHANNEL: ${{ inputs.channel }}
+        AFS_GROUPS: ${{ inputs.groups }}
+        AFS_TESTERS: ${{ inputs.testers }}
       run: |
         args=(upload "$AFS_FILE")
         if [ -n "$AFS_NOTES" ]; then args+=(--notes "$AFS_NOTES"); fi
         if [ -n "$AFS_FAIL_ON" ]; then args+=(--fail-on "$AFS_FAIL_ON"); fi
         if [ -n "$AFS_CHANNEL" ]; then args+=(--channel "$AFS_CHANNEL"); fi
+        if [ -n "$AFS_GROUPS" ]; then args+=(--groups "$AFS_GROUPS"); fi
+        if [ -n "$AFS_TESTERS" ]; then args+=(--testers "$AFS_TESTERS"); fi
         npx --yes appforshare@1 "${args[@]}"

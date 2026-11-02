@@ -26,6 +26,8 @@ your own keystore if you added one under Settings, Android .aab uploads.
 | `token` | yes | AppForShare API token |
 | `release-notes` | no | Shown to testers on the install page |
 | `channel` | no | Put the build into a channel (`beta`, `live`), created on first use. Its link always opens the newest build in it. |
+| `groups` | no | Share the build with these tester groups when it is ready, comma separated (Team). |
+| `testers` | no | Share the build with these tester emails when it is ready, comma separated (Team). |
 | `fail-on` | no | `blocked`, or `review` (also fails on blocked): fail the step on the store readiness check. The build stays uploaded and its link works. |
 | `api-url` | no | API origin, default `https://appforshare.io` |
 
