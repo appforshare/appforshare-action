@@ -6,13 +6,22 @@ branding:
   color: blue
 inputs:
   file:
-    description: Path to the .ipa, .apk or .aab
-    required: true
+    description: 'Path to the .ipa, .apk or .aab, or a folder (its newest build goes). Leave empty to send the newest iOS and Android builds from the folders in appforshare.config.json (made by npx appforshare init).'
+    required: false
+    default: ''
   token:
     description: AppForShare API token (store it as a secret)
     required: true
   release-notes:
     description: Release notes shown to testers
+    required: false
+    default: ''
+  ios-release-notes:
+    description: Release notes for the iOS build only (with a folder or appforshare.config.json)
+    required: false
+    default: ''
+  android-release-notes:
+    description: Release notes for the Android build only
     required: false
     default: ''
   channel:
@@ -56,6 +65,12 @@ outputs:
   channel-url:
     description: Stable link of the channel (with the channel input)
     value: ${{ steps.upload.outputs.channel_url }}
+  ios-url:
+    description: Install link of the iOS build, when one run sent both platforms
+    value: ${{ steps.upload.outputs.ios_url }}
+  android-url:
+    description: Install link of the Android build, when one run sent both platforms
+    value: ${{ steps.upload.outputs.android_url }}
 runs:
   using: composite
   steps:
@@ -66,6 +81,8 @@ runs:
         APPFORSHARE_API: ${{ inputs.api-url }}
         AFS_FILE: ${{ inputs.file }}
         AFS_NOTES: ${{ inputs.release-notes }}
+        AFS_IOS_NOTES: ${{ inputs.ios-release-notes }}
+        AFS_ANDROID_NOTES: ${{ inputs.android-release-notes }}
         AFS_FAIL_ON: ${{ inputs.fail-on }}
         AFS_CHANNEL: ${{ inputs.channel }}
         AFS_GROUPS: ${{ inputs.groups }}
@@ -73,12 +90,15 @@ runs:
         AFS_EMAIL: ${{ inputs.email }}
         AFS_PASSWORD: ${{ inputs.password }}
       run: |
-        args=(upload "$AFS_FILE")
+        args=(upload)
+        if [ -n "$AFS_FILE" ]; then args+=("$AFS_FILE"); fi
         if [ -n "$AFS_NOTES" ]; then args+=(--notes "$AFS_NOTES"); fi
+        if [ -n "$AFS_IOS_NOTES" ]; then args+=(--ios-notes "$AFS_IOS_NOTES"); fi
+        if [ -n "$AFS_ANDROID_NOTES" ]; then args+=(--android-notes "$AFS_ANDROID_NOTES"); fi
         if [ -n "$AFS_FAIL_ON" ]; then args+=(--fail-on "$AFS_FAIL_ON"); fi
         if [ -n "$AFS_CHANNEL" ]; then args+=(--channel "$AFS_CHANNEL"); fi
         if [ -n "$AFS_GROUPS" ]; then args+=(--groups "$AFS_GROUPS"); fi
         if [ -n "$AFS_TESTERS" ]; then args+=(--testers "$AFS_TESTERS"); fi
         if [ -n "$AFS_EMAIL" ]; then args+=(--email "$AFS_EMAIL"); fi
         if [ -n "$AFS_PASSWORD" ]; then args+=(--password "$AFS_PASSWORD"); fi
-        npx --yes appforshare@1 "${args[@]}"
+        npx --yes appforshare@^1.11.0 "${args[@]}"

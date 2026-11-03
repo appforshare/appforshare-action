@@ -14,6 +14,20 @@ QR code page for your testers.
 - run: echo "Install: ${{ steps.afs.outputs.url }}"
 ```
 
+Flutter or React Native app with both platforms? Run `npx appforshare init` once in the repo and commit the
+`appforshare.config.json` it writes (where your iOS and Android builds land, and a channel). Then leave `file` out:
+one step sends the newest build of each platform.
+
+```yaml
+- uses: appforshare/appforshare-action@v1
+  id: afs
+  with:
+    token: ${{ secrets.APPFORSHARE_TOKEN }}
+    ios-release-notes: New checkout screen
+    android-release-notes: New checkout screen, Android 15 fix
+- run: echo "iOS ${{ steps.afs.outputs.ios-url }} Android ${{ steps.afs.outputs.android-url }}"
+```
+
 Needs a Pro or Team plan. Create the token in your AppForShare dashboard under Settings, API tokens, and store it
 as a repository secret. The runner needs Node 18 or newer (GitHub hosted runners have it).
 
@@ -22,9 +36,11 @@ your own keystore if you added one under Settings, Android .aab uploads.
 
 | Input | Required | |
 |---|---|---|
-| `file` | yes | Path to the .ipa, .apk or .aab |
+| `file` | no | Path to the .ipa, .apk or .aab, or a folder (its newest build goes). Empty: the folders in `appforshare.config.json`. |
 | `token` | yes | AppForShare API token |
 | `release-notes` | no | Shown to testers on the install page |
+| `ios-release-notes` | no | Release notes for the iOS build only |
+| `android-release-notes` | no | Release notes for the Android build only |
 | `channel` | no | Put the build into a channel (`beta`, `live`), created on first use. Its link always opens the newest build in it. |
 | `groups` | no | Share the build with these tester groups when it is ready, comma separated (Team). |
 | `testers` | no | Share the build with these tester emails when it is ready, comma separated (Team). |
@@ -39,6 +55,8 @@ your own keystore if you added one under Settings, Android .aab uploads.
 | `slug` | Share code of the build |
 | `readiness` | Store readiness status: `ready`, `review`, `blocked` or `unknown` |
 | `channel-url` | Stable link of the channel, when `channel` is set |
+| `ios-url` | Install link of the iOS build, when one run sent both platforms |
+| `android-url` | Install link of the Android build, when one run sent both platforms |
 
 The store readiness check is guidance about current App Store and Google Play rules, not a promise of approval.
 More examples: https://appforshare.io/docs/ci
