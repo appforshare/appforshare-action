@@ -27,6 +27,14 @@ inputs:
     description: 'Share the build with these tester emails when ready, comma separated (Team).'
     required: false
     default: ''
+  email:
+    description: 'Email the install link to up to 5 addresses when ready, comma separated (Pro and Team).'
+    required: false
+    default: ''
+  password:
+    description: 'Protect the install link with a password (4 to 128 characters). Pass it from a secret.'
+    required: false
+    default: ''
   fail-on:
     description: 'Fail the step when the store readiness check is "blocked", or "review" (also fails on blocked). The build is still uploaded.'
     required: false
@@ -62,6 +70,8 @@ runs:
         AFS_CHANNEL: ${{ inputs.channel }}
         AFS_GROUPS: ${{ inputs.groups }}
         AFS_TESTERS: ${{ inputs.testers }}
+        AFS_EMAIL: ${{ inputs.email }}
+        AFS_PASSWORD: ${{ inputs.password }}
       run: |
         args=(upload "$AFS_FILE")
         if [ -n "$AFS_NOTES" ]; then args+=(--notes "$AFS_NOTES"); fi
@@ -69,4 +79,6 @@ runs:
         if [ -n "$AFS_CHANNEL" ]; then args+=(--channel "$AFS_CHANNEL"); fi
         if [ -n "$AFS_GROUPS" ]; then args+=(--groups "$AFS_GROUPS"); fi
         if [ -n "$AFS_TESTERS" ]; then args+=(--testers "$AFS_TESTERS"); fi
+        if [ -n "$AFS_EMAIL" ]; then args+=(--email "$AFS_EMAIL"); fi
+        if [ -n "$AFS_PASSWORD" ]; then args+=(--password "$AFS_PASSWORD"); fi
         npx --yes appforshare@1 "${args[@]}"

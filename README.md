@@ -28,6 +28,8 @@ your own keystore if you added one under Settings, Android .aab uploads.
 | `channel` | no | Put the build into a channel (`beta`, `live`), created on first use. Its link always opens the newest build in it. |
 | `groups` | no | Share the build with these tester groups when it is ready, comma separated (Team). |
 | `testers` | no | Share the build with these tester emails when it is ready, comma separated (Team). |
+| `email` | no | Email the install link to up to 5 addresses when it is ready, comma separated (Pro and Team). |
+| `password` | no | Protect the install link with a password (4 to 128 characters). Pass it from a secret. |
 | `fail-on` | no | `blocked`, or `review` (also fails on blocked): fail the step on the store readiness check. The build stays uploaded and its link works. |
 | `api-url` | no | API origin, default `https://appforshare.io` |
 
