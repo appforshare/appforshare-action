@@ -28,6 +28,29 @@ one step sends the newest build of each platform.
 - run: echo "iOS ${{ steps.afs.outputs.ios-url }} Android ${{ steps.afs.outputs.android-url }}"
 ```
 
+Reviewers can install a pull request straight from it: with `pr-comment: true` the action keeps one comment on
+the pull request with the iOS and Android install links, their QR codes, the store readiness result and the channel,
+and updates it on each run (an iOS job and an Android job fill the same comment). It uses the workflow token, so give
+the job permission to write pull requests. On push and manual runs it comments on the open pull request of the
+branch, if there is one. Pull requests from forks get a read only token and no secrets, so nothing is posted there.
+
+```yaml
+on: pull_request
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # ... build the app ...
+      - uses: appforshare/appforshare-action@v1
+        with:
+          file: app/build/outputs/apk/release/app-release.apk
+          token: ${{ secrets.APPFORSHARE_TOKEN }}
+          pr-comment: true
+```
+
 Needs a Pro or Team plan. Create the token in your AppForShare dashboard under Settings, API tokens, and store it
 as a repository secret. The runner needs Node 18 or newer (GitHub hosted runners have it).
 
@@ -47,6 +70,8 @@ your own keystore if you added one under Settings, Android .aab uploads.
 | `email` | no | Email the install link to up to 5 addresses when it is ready, comma separated (Pro and Team). |
 | `password` | no | Protect the install link with a password (4 to 128 characters). Pass it from a secret. |
 | `fail-on` | no | `blocked`, or `review` (also fails on blocked): fail the step on the store readiness check. The build stays uploaded and its link works. |
+| `pr-comment` | no | `true`: one comment on the pull request with install links, QR codes, store readiness and channel, updated on each run. Needs `pull-requests: write`. |
+| `github-token` | no | Token for the pull request comment, default the workflow token |
 | `api-url` | no | API origin, default `https://appforshare.io` |
 
 | Output | |
@@ -57,6 +82,7 @@ your own keystore if you added one under Settings, Android .aab uploads.
 | `channel-url` | Stable link of the channel, when `channel` is set |
 | `ios-url` | Install link of the iOS build, when one run sent both platforms |
 | `android-url` | Install link of the Android build, when one run sent both platforms |
+| `pr-comment-url` | Link to the pull request comment, with `pr-comment` |
 
 The store readiness check is guidance about current App Store and Google Play rules, not a promise of approval.
 More examples: https://appforshare.io/docs/ci

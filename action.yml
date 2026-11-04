@@ -48,6 +48,14 @@ inputs:
     description: 'Fail the step when the store readiness check is "blocked", or "review" (also fails on blocked). The build is still uploaded.'
     required: false
     default: ''
+  pr-comment:
+    description: 'Put the install links, QR codes, store readiness and channel into one comment on the pull request, updated on each run (Pro and Team). Needs "permissions: pull-requests: write" on the job.'
+    required: false
+    default: 'false'
+  github-token:
+    description: 'Token used for the pull request comment. The default is the workflow token.'
+    required: false
+    default: ${{ github.token }}
   api-url:
     description: API origin
     required: false
@@ -71,6 +79,9 @@ outputs:
   android-url:
     description: Install link of the Android build, when one run sent both platforms
     value: ${{ steps.upload.outputs.android_url }}
+  pr-comment-url:
+    description: Link to the pull request comment, with pr-comment
+    value: ${{ steps.upload.outputs.pr_comment_url }}
 runs:
   using: composite
   steps:
@@ -89,7 +100,10 @@ runs:
         AFS_TESTERS: ${{ inputs.testers }}
         AFS_EMAIL: ${{ inputs.email }}
         AFS_PASSWORD: ${{ inputs.password }}
+        AFS_PR_COMMENT: ${{ inputs.pr-comment }}
+        AFS_GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
+        cli='appforshare@^1.11.0'
         args=(upload)
         if [ -n "$AFS_FILE" ]; then args+=("$AFS_FILE"); fi
         if [ -n "$AFS_NOTES" ]; then args+=(--notes "$AFS_NOTES"); fi
@@ -101,4 +115,9 @@ runs:
         if [ -n "$AFS_TESTERS" ]; then args+=(--testers "$AFS_TESTERS"); fi
         if [ -n "$AFS_EMAIL" ]; then args+=(--email "$AFS_EMAIL"); fi
         if [ -n "$AFS_PASSWORD" ]; then args+=(--password "$AFS_PASSWORD"); fi
-        npx --yes appforshare@^1.11.0 "${args[@]}"
+        if [ "$AFS_PR_COMMENT" = "true" ]; then
+          args+=(--pr-comment)
+          export GITHUB_TOKEN="$AFS_GITHUB_TOKEN"
+          cli='appforshare@^1.19.0'
+        fi
+        npx --yes "$cli" "${args[@]}"
